@@ -1,4 +1,4 @@
-
+const router = require('./router/routes')
 var express = require('express')
 var bodyParser = require('body-parser')
 // Configuring the database
@@ -11,7 +11,8 @@ app.use(bodyParser.urlencoded({ extended: false }))
  
 // parse application/json
 app.use(bodyParser.json())
-
+app.use('/', router);
+require('dotenv').config()
 mongoose.Promise = global.Promise;
 
 //Connecting to the database
