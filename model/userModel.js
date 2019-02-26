@@ -105,8 +105,31 @@ userModel.prototype.findUserEmail = (data, callBack) => {
         }
     });
 }
-
-userModel.prototype.getAllUser = (data, callBack) => {
+userModel.prototype.confirmUser = (data, callBack) => {
+    user.updateOne({ _id: data.payload.id }, { is_verified: true }, (err, result) => {
+        if (err) {
+            callBack(err);
+        }
+        else {
+            callBack(null, result);
+        }
+    });
+}
+userModel.prototype.updatePassword = (req, callBack) => {
+    console.log(' in model--data:--', req.decoded);
+    console.log(' in model--body:--', req.body);
+    let newPassword = bcrypt.hashSync(req.body.password, saltRounds)
+    console.log("new password:", newPassword);
+    user.updateOne({ _id: req.decoded.payload.user_id }, { password: newPassword }, (err, result) => {
+        if (err) {
+            callBack(err);
+        }
+        else {
+            callBack(null, result);
+        }
+    });
+}
+userModel.prototype.getAllUser = (callBack) => {
     user.find({}, (err, result) => {
         if (err) {
             callBack(err);
@@ -116,4 +139,8 @@ userModel.prototype.getAllUser = (data, callBack) => {
         }
     });
 }
+
+
+
+
 module.exports = new userModel;

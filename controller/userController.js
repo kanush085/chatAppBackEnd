@@ -57,14 +57,50 @@ exports.forgotpassword = (req, res) => {
             const payload = {
                 user_id: responseResult.result._id
             }
-            console.log(payload);
+            console.log("payload==>",payload);
             const obj = util.generateToken(payload)
             console.log("controller obj", obj);
 
-            const url = ""
+            const url = `http://localhost:3000/Resetpassword/${obj.token}`;
+        
+            console.log("url in contoller==>",url);
 
-            sentMail.sendMailFunction(url)
+            sentMail.sendEMailFunction(url)
             res.status(200).send(url)
+        }
+    })
+}
+exports.sendResponse = (req, res) => {
+    var responseResult = {};
+    console.log('in user ctrl send token is verified response');
+    userService.redirect(req.decoded, (err, result) => {
+        if (err) {
+            responseResult.success = false;
+            responseResult.error = err;
+            res.status(500).send(responseResult)
+        }
+        else {
+            console.log('in user ctrl token is verified giving response');
+            responseResult.success = true;
+            responseResult.result = result;
+            res.status(200).send(responseResult);
+        }
+    })
+}
+exports.resetPassword = (req, res) => {
+    var responseResult = {};
+    userService.resetPassword(req, (err, result) => {
+
+        if (err) {
+            responseResult.success = false;
+            responseResult.error = err;
+            res.status(500).send(responseResult)
+        }
+        else {
+            console.log("In user control token generated and response is given");
+            responseResult.success = true;
+            responseResult.result = result;
+            res.status(200).send(responseResult)
         }
     })
 }

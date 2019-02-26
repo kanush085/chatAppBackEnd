@@ -1,34 +1,30 @@
-const nodemailer = require('nodemailer')
 
-exports.sendMailFunction = (url) => {
+const nodemailer = require('nodemailer');
 
-    const transport = nodemailer.createTransport({
+exports.sendEMailFunction = (url) => {
+   
+    const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
+           
             user: process.env.email,
             pass: process.env.password
-
         },
     });
     const mailOptions = {
-        from: process.env.email,
-        to: process.env.email,
-        subject: 'send mail node.js',
-        text: 'verification link\n' + url
+        from: process.env.email,        
+      
+        to: process.env.email,   
+    
+        subject: 'node.js send mail',       
+        
+        text: ' verifaction link is:\n\n' + url
     };
-
-
-    transport.sendMail(mailOptions, (err, info) => {
-        if (err) {
-            console.log("error in sent mail" + err);
-
-        }
-        else {
-            console.log("mail sent successfully" + info);
-
-        }
+    
+    transporter.sendMail(mailOptions, (err, info) => {
+        if (err)
+            console.log("error on sent mail" + err)
+        else
+            console.log("result sent on mail" + info);
     });
-
-
-
 }

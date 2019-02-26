@@ -17,7 +17,7 @@ exports.login = (data, callBack) => {
     userModel.login(data, (err, result) => {
         if (err) {
             console.log("service error");
-            callBack(error)
+            callBack(err)
 
         }
         else {
@@ -37,7 +37,26 @@ exports.getUserEmail = (data, callBack) => {
         }
     })
 }
-
+exports.redirect = (decoded, callBack) => {
+    userModel.confirmUser(decoded, (err, result) => {
+        if (err) {
+            callBack(err);
+        } else {
+            callBack(null, result);
+        }
+    })
+}
+exports.resetPassword=(req,callBack)=>{
+    userModel.updatePassword(req,(err,result)=>{
+        if(err)
+        {
+            callback(err);
+        }
+        else{
+            callBack(null,result)
+        }
+    })
+}
 exports.getAllUser = (data, callBack) => {
     userModel.getAllUser(data, (err, result) => {
         if (err) {

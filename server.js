@@ -12,6 +12,8 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 app.use('/', router);
+app.use(express.static('../client'))
+
 require('dotenv').config()
 mongoose.Promise = global.Promise;
 
