@@ -1,8 +1,8 @@
 const userService = require('../services/userServices')
 const util = require('../util/token')
 const sentMail = require('../middleware/nodemailer')
+const exp=require('express-validator')
 exports.registration = (req, res) => {
-
     var responseResult = {};
     userService.registration(req.body, (err, result) => {
         if (err) {

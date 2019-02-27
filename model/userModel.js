@@ -15,6 +15,9 @@ const UserSchema = mongoose.Schema({
     },
     password: {
         type: String, require: [true, "password require"]
+    },
+    repeatpassword: {
+        type: String, require: [true, "repeatpassword require"]
     }
 },
     {
@@ -44,8 +47,9 @@ userModel.prototype.registration = (body, callBack) => {
                 "firstname": body.firstname,
                 "lastname": body.lastname,
                 "email": body.email,
-                "password": hash(body.password)
+                "password": hash(body.password),
             });
+            //To save the data in dbs
             newUser.save((err, result) => {
                 if (err) {
                     console.log("Model not found");
@@ -64,9 +68,11 @@ userModel.prototype.registration = (body, callBack) => {
 
 userModel.prototype.login = (body, callBack) => {
     user.findOne({ "email": body.email }, (err, data) => {
+        //if findone results error
         if (err) {
             callBack(err)
         }
+        //if data is not equal to null then compare the password.
         else if (data != null) {
             bcrypt.compare(body.password, data.password).then(function (res) {
                 if (res) {
