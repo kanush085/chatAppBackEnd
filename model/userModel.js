@@ -1,6 +1,19 @@
+/************************************************************
+ * 
+ * Purpose      :   To store the data in database using mongoSchema.
+ * 
+ * @description
+ * 
+ * @file        :   userModel.js
+ * @overview    :   Storing the userdata in database.
+ * @author      :   AnushKumar SK <anushk136@gmail.com>
+ * @version     :   1.0
+ * @since       :   05-03-2019
+ * 
+ * **********************************************************/
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-let saltRounds = 15;
+let saltRounds = 10;
 
 const UserSchema = mongoose.Schema({
     firstname: {
@@ -67,29 +80,32 @@ userModel.prototype.registration = (body, callBack) => {
 }
 
 userModel.prototype.login = (body, callBack) => {
-    user.findOne({ "email": body.email }, (err, data) => {
+    user.find({ "email": body.email }, (err, data) => {
         //if findone results error
         if (err) {
             callBack(err)
         }
         //if data is not equal to null then compare the password.
-        else if (data != null) {
-            bcrypt.compare(body.password, data.password).then(function (res) {
+        else if (data.length > 0) {
+            bcrypt.compare(body.password, data[0].password, function (err, res) {
                 if (res) {
                     console.log("Login Successfully");
-                    callBack(null, res);
+                    return callBack(null, data);
+
+                }
+                else if (err) {
+                    console.log("Incorrect Password");
+                    return callBack("Incorrect Password");
 
                 }
                 else {
-                    console.log("Incorrect Password");
-                    callBack("Incorrect Password");
-
+                    return callBack("Incorrect password").status(500)
                 }
             });
 
         } else {
             console.log("Invalid User");
-            callBack("Invalid User");
+            return callBack("Invalid User");
 
         }
     });
@@ -100,9 +116,10 @@ userModel.prototype.findUserEmail = (data, callBack) => {
         if (err) {
             callBack(err);
         }
-        else {
+        else if(result){
+            //console.log("data in models==>",result[0]._id);
             if (result !== null && data.email == result.email) {
-                callBack(null, result);
+              return  callBack(null, result);
 
             }
             else {
@@ -135,7 +152,7 @@ userModel.prototype.updatePassword = (req, callBack) => {
         }
     });
 }
-userModel.prototype.getAllUser = (callBack) => {
+userModel.prototype.getAllUser = (req, callBack) => {
     user.find({}, (err, result) => {
         if (err) {
             callBack(err);

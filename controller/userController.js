@@ -1,74 +1,126 @@
+/************************************************************
+ * 
+ * Purpose      :   To validate and control the functionality.
+ * 
+ * @description
+ * 
+ * @file        :   userController.js
+ * @overview    :   To validate and and passing the control to the service.
+ * @author      :   AnushKumar SK <anushk136@gmail.com>
+ * @version     :   1.0
+ * @since       :   05-03-2019
+ * 
+ * **********************************************************/
 const userService = require('../services/userServices')
 const util = require('../util/token')
+const jwt = require('jsonwebtoken')
 const sentMail = require('../middleware/nodemailer')
-const exp=require('express-validator')
+const exp = require('express-validator')
 exports.registration = (req, res) => {
-    var responseResult = {};
-    userService.registration(req.body, (err, result) => {
-        if (err) {
-            responseResult.success = false;
-            responseResult.error = err;
-            res.status(500).send(responseResult)
+    console.log("inside register");
+    req.checkBody('firstname', 'Firstname is not valid').isLength({ min: 3 }).isAlpha();
+    req.checkBody('lastname', 'Lastname is not valid').isLength({ min: 3 }).isAlpha();
+    req.checkBody('email', 'Email is not valid').isEmail();
+    req.checkBody('password', 'password is not valid').isLength({ min: 4 });
+    var errors = req.validationErrors();
+    var response = {};
+    if (errors) {
+        response.success = false;
+        response.error = errors;
+        return res.status(422).send(response);
+    } else {
 
-        }
-        else {
-            responseResult.success = true;
-            responseResult.result = result;
-            res.status(200).send(responseResult)
-        }
-    })
-
+        userService.registration(req.body, (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).send({
+                    message: err
+                })
+            }
+            else {
+                return res.status(200).send({
+                    message: result
+                });
+            }
+        })
+    }
 }
 exports.login = (req, res) => {
     try {
-        var responseResult = {};
-        userService.login(req.body, (err, result) => {
-            if (err) {
-                responseResult.success = false;
-                responseResult.error = err;
-                res.status(500).send(responseResult)
-            }
-            else {
-                responseResult.success = true;
-                responseResult.result = result;
-                console.log("Login is working fine");
-                console.log("result", result, responseResult);
-                res.status(200).send(responseResult);
-            }
-        })
+        console.log("req in controller", req.body);
+        req.checkBody('email', 'Email is not valid').isEmail();
+        req.checkBody('password', 'password is not valid').isLength({ min: 4 });
+        console.log("----------------------");
+
+        var secret = "adcgfft";
+        var errors = req.validationErrors();
+        var response = {};
+        if (errors) {
+            response.success = false;
+            response.error = errors;
+            return res.status(422).send(response);
+        }
+        else {
+            // var obj = { email: req.body.email, password: req.body.password }
+            userService.login(req.body, (err, result) => {
+                if (err) {
+                    return res.status(500).send({
+                        message: err
+                    });
+                }
+                else {
+                    var token = jwt.sign({ email: req.body.email, id: result[0]._id }, secret, { expiresIn: 86400000 });
+                    return res.status(200).send({
+                        message: result,
+                        "token": token
+                    });
+                }
+            })
+        }
     } catch (error) {
         res.send(error)
 
     }
 }
 exports.forgotpassword = (req, res) => {
-    var responseResult = {};
-    userService.getUserEmail(req.body, (err, result) => {
-        if (err) {
-            responseResult.success = false;
-            responseResult.error = err;
-            res.status(500).send(responseResult)
+    req.checkBody('email', 'Email is not valid').isEmail();
+    var secret = "adcgfft";
+    var errors = req.validationErrors();
+    var response = {};
+    if (errors) {
+        response.success = false;
+        response.error = errors;
+        return res.status(422).send(response);
+    }
+    else {
+        userService.getUserEmail(req.body, (err, result) => {
 
-        }
-        else {
-            responseResult.success = true;
-            responseResult.result = result;
-
-            const payload = {
-                user_id: responseResult.result._id
+            if (err) {
+                console.log(err);
+                return res.status(500).send({
+                    message: err
+                });
             }
-            console.log("payload==>",payload);
-            const obj = util.generateToken(payload)
-            console.log("controller obj", obj);
+            else {
+                response.success = true;
+                response.result = result;
 
-            const url = `http://localhost:3000/Resetpassword/${obj.token}`;
-        
-            console.log("url in contoller==>",url);
+                const payload = {
+                    user_id: response.result._id
+                }
+                console.log("payload==>", payload);
+                const obj = util.generateToken(payload)
+                console.log("controller obj", obj);
 
-            sentMail.sendEMailFunction(url)
-            res.status(200).send(url)
-        }
-    })
+                const url = `http://localhost:3000/Resetpassword/${obj.token}`;
+
+                console.log("url in contoller==>", url);
+
+                sentMail.sendEMailFunction(url)
+                res.status(200).send(url)
+            }
+        })
+    }
 }
 exports.sendResponse = (req, res) => {
     var responseResult = {};
@@ -88,29 +140,39 @@ exports.sendResponse = (req, res) => {
     })
 }
 exports.resetPassword = (req, res) => {
-    var responseResult = {};
-    userService.resetPassword(req, (err, result) => {
+    console.log("inside forgotPassword");
+    req.checkBody('password', 'password is not valid').isLength({ min: 4 }).equals(req.body.confirmPassword);
+    var errors = req.validationErrors();
+    var response = {};
+    if (errors) {
+        response.success = false;
+        response.error = errors;
+        return res.status(422).send(response);
+    }
+    else {
+        userService.resetPassword(req.body, (err, result) => {
 
-        if (err) {
-            responseResult.success = false;
-            responseResult.error = err;
-            res.status(500).send(responseResult)
-        }
-        else {
-            console.log("In user control token generated and response is given");
-            responseResult.success = true;
-            responseResult.result = result;
-            res.status(200).send(responseResult)
-        }
-    })
+            if (err) {
+                console.log(err);
+                return res.status(500).send({
+                    message: err
+                });
+            }
+            else {
+                console.log("In user control token generated and response is given");
+                console.log(err);
+                return res.status(200).send({
+                    message: result
+                });
+            }
+        })
+    }
 }
 exports.getAllUser = (req, res) => {
-    var responseResult = {};
-    userService.getAllUser((err, result) => {
+    userService.getAllUser(req, (err, result) => {
+        var responseResult = {};
         if (err) {
-            responseResult.success = false;
-            responseResult.error = err;
-            res.status(500).send(responseResult)
+            return callback(err);
         }
         else {
             responseResult.success = true;
