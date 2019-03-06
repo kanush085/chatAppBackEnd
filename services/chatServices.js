@@ -10,6 +10,10 @@
  * **********************************************************/
 const chatModel = require('../model/chatModel');
 
+/***********addMessage****************
+ * @description:Passing the data to model to store the data in db.
+ * @param:request and callback function.
+ */
 exports.addMessage = (req, callBack) => {
     console.log("Request on chat service");
     chatModel.addMessage(req, (err, data) => {
@@ -21,8 +25,12 @@ exports.addMessage = (req, callBack) => {
         }
     })
 }
-exports.getUserMsg = (req,callBack) => {
-    chatModel.getUserMsg(req,(err, data) => {
+/***********getUserMsg****************
+ * @description:Passing the data to model to store the data in db.
+ * @param:request and callback function.
+ */
+exports.getUserMsg = (req, callBack) => {
+    chatModel.getUserMsg(req, (err, data) => {
         if (err) {
             console.log("chat services is not working");
             callBack(err);

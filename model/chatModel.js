@@ -26,7 +26,11 @@ function chatModel() {
 
 }
 const chat = mongoose.model('chats', chatSchema);
-
+/***********addMessage****************
+ * @description:Add user message in the database
+ *              using mongoschema.
+ * @param:request and callback function.
+ */
 chatModel.prototype.addMessage = (chatData, callBack) => {
     let newMsg = new chat({
         'senderUserId': chatData.senderUserId,
@@ -48,14 +52,19 @@ chatModel.prototype.addMessage = (chatData, callBack) => {
         }
     })
 }
-chatModel.prototype.getUserMsg = (req,callBack) => {
+/***********getUserMsg****************
+ * @description:Get user message from the database.
+ * 
+ * @param:request and callback function.
+ */
+chatModel.prototype.getUserMsg = (req, callBack) => {
     chat.find({}, (err, data) => {
         if (err) {
             return callBack("Error in chat model" + err);
         }
         else {
-            console.log("----------------------------------",data);
-            
+            console.log("----------------------------------", data);
+
             return callBack(null, data);
         }
     })

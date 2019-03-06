@@ -9,7 +9,10 @@
  * 
  * **********************************************************/
 const userModel = require('../model/userModel')
-
+/***********registration****************
+ * @description:Passing the data to model to store the data in db.
+ * @param:request and callback function.
+ */
 exports.registration = (data, callBack) => {
     userModel.registration(data, (err, result) => {
         if (err) {
@@ -23,6 +26,11 @@ exports.registration = (data, callBack) => {
         }
     })
 }
+
+/***********login****************
+ * @description:Passing the data to model to store the data in db.
+ * @param:request and callback function.
+ */
 exports.login = (data, callBack) => {
     userModel.login(data, (err, result) => {
         if (err) {
@@ -37,6 +45,10 @@ exports.login = (data, callBack) => {
     })
 
 }
+/***********getUserEmail****************
+ * @description:Passing the data to model to store the data in db.
+ * @param:request and callback function.
+ */
 exports.getUserEmail = (data, callBack) => {
     userModel.findUserEmail(data, (err, result) => {
 
@@ -56,6 +68,10 @@ exports.redirect = (decoded, callBack) => {
         }
     })
 }
+/***********resetPassword****************
+ * @description:Passing the data to model to store the data in db.
+ * @param:request and callback function.
+ */
 exports.resetPassword = (req, callBack) => {
     userModel.updatePassword(req, (err, result) => {
         if (err) {
@@ -66,6 +82,10 @@ exports.resetPassword = (req, callBack) => {
         }
     })
 }
+/***********getAllUser****************
+ * @description:Passing the data to model to store the data in db.
+ * @param:request and callback function.
+ */
 exports.getAllUser = (req, callBack) => {
     userModel.getAllUser(req, (err, result) => {
         if (err) {

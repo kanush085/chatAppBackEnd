@@ -43,12 +43,16 @@ function hash(password) {
     var hash = bcrypt.hashSync(password, saltRounds);
     return hash;
 }
+/***********registration****************
+ * @description:First validate the user exists already if not store the user data in the database
+ *              using mongoschema.
+ * @param:request and callback function.
+ */
 userModel.prototype.registration = (body, callBack) => {
     user.find({ "email": body.email }, (err, data) => {
         if (err) {
             console.log("Error is registration");
             callBack(err)
-
         }
         else if (data.length > 0) {
             console.log("data.length" + data);
@@ -78,7 +82,10 @@ userModel.prototype.registration = (body, callBack) => {
     });
 
 }
-
+/***********login****************
+ * @description:Find  the email-id ib db and bcrypt the password and show the message to the user.
+ * @param:request and callback function.
+ */
 userModel.prototype.login = (body, callBack) => {
     user.find({ "email": body.email }, (err, data) => {
         //if findone results error
@@ -110,16 +117,20 @@ userModel.prototype.login = (body, callBack) => {
         }
     });
 }
+/***********findUserEmail****************
+ * @description:Find the email-id in db if it is not valid show error message else send the result.
+ * @param:request and callback function.
+ */
 
 userModel.prototype.findUserEmail = (data, callBack) => {
     user.findOne({ "email": data.email }, (err, result) => {
         if (err) {
             callBack(err);
         }
-        else if(result){
+        else if (result) {
             //console.log("data in models==>",result[0]._id);
             if (result !== null && data.email == result.email) {
-              return  callBack(null, result);
+                return callBack(null, result);
 
             }
             else {
@@ -138,6 +149,12 @@ userModel.prototype.confirmUser = (data, callBack) => {
         }
     });
 }
+/***********updatePassword****************
+ * @description:Take the password from the request and bcrypt the password using saltround and 
+ *              update the password to the specified  email-id.
+ * @param:request and callback function.
+ */
+
 userModel.prototype.updatePassword = (req, callBack) => {
     console.log(' in model--data:--', req.decoded);
     console.log(' in model--body:--', req.body);
@@ -152,6 +169,10 @@ userModel.prototype.updatePassword = (req, callBack) => {
         }
     });
 }
+/***********getAllUser****************
+ * @description:Find all user from the db and return the array.
+ * @param:request and callback function.
+ */
 userModel.prototype.getAllUser = (req, callBack) => {
     user.find({}, (err, result) => {
         if (err) {
@@ -162,8 +183,4 @@ userModel.prototype.getAllUser = (req, callBack) => {
         }
     });
 }
-
-
-
-
 module.exports = new userModel;

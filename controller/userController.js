@@ -16,6 +16,11 @@ const util = require('../util/token')
 const jwt = require('jsonwebtoken')
 const sentMail = require('../middleware/nodemailer')
 const exp = require('express-validator')
+/***********registration****************
+ * @description:To validate the user inputs using express validator and 
+ *              send the request body to service controller.
+ * @param:request and response.
+ */
 exports.registration = (req, res) => {
     console.log("inside register");
     req.checkBody('firstname', 'Firstname is not valid').isLength({ min: 3 }).isAlpha();
@@ -45,6 +50,11 @@ exports.registration = (req, res) => {
         })
     }
 }
+/***********login****************
+ * @description:Take the user req and validate the email-id and password and 
+ *              send the request body to service controller.
+ * @param:request and response.
+ */
 exports.login = (req, res) => {
     try {
         console.log("req in controller", req.body);
@@ -82,6 +92,12 @@ exports.login = (req, res) => {
 
     }
 }
+/***********forgotpassword****************
+ * @description:Take the user req and validate the email-id 
+ *              send the request body to service controller if the result is true generate the token
+ *              using jwt.
+ * @param:request and response.
+ */
 exports.forgotpassword = (req, res) => {
     req.checkBody('email', 'Email is not valid').isEmail();
     var secret = "adcgfft";
@@ -139,6 +155,12 @@ exports.sendResponse = (req, res) => {
         }
     })
 }
+/***********resetPassword****************
+ * @description:Take the user req and validate the password and update the password to
+ *              the specified email-id.
+ *           
+ * @param:request and response.
+ */
 exports.resetPassword = (req, res) => {
     console.log("inside forgotPassword");
     req.checkBody('password', 'password is not valid').isLength({ min: 4 }).equals(req.body.confirmPassword);
@@ -168,6 +190,11 @@ exports.resetPassword = (req, res) => {
         })
     }
 }
+/***********getAllUser****************
+ * @description:Take the user req and paas the control to service to  get alluser 
+ *              from the database.         
+ * @param:request and response.
+ */
 exports.getAllUser = (req, res) => {
     userService.getAllUser(req, (err, result) => {
         var responseResult = {};
